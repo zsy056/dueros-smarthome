@@ -224,6 +224,9 @@ class Brightness(Num):
     def __init__(self, value: int):
         super().__init__(value, scale = '%', min = 1, max = 100)
 
+    def percentage(self) -> int:
+        return self._value
+
 class BrightnessSetting:
     def __init__(self, brightness_setting: dict):
         self._brightness = Brightness(brightness_setting[const.VALUE])
@@ -237,8 +240,11 @@ class ColorTemperatureInKelvin(Num):
         self._kelvin_min = kelvin_min
         self._kelvin_min = kelvin_max
     
-    def get_kelvin(self):
+    def get_kelvin(self) -> int:
         return self._kelvinMin + (self._kelvinMax - self._kelvinMin) * (self._value - self._min + 1) / (self._max - self._min + 1)
+
+    def percentage(self) -> int:
+        return self._value
 
 class ColorTemperatureInKelvinSetting:
     def __init__(self, setting: dict):

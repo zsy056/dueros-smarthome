@@ -24,25 +24,35 @@ class Request:
     
     def to_bytes(self):
         return json.dumps(self._dict)
-    
+
 class TurnOffRequest(Request):
     def __init__(self, appliance_id: str):
-        payload = get_turn_off_request_payload(appliance_id)
+        payload = get_device_action_request_payload(appliance_id)
         super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.TURN_OFF_REQUEST, payload)
     
-def get_device_action_request_payload(action_name: str, appliance_id: str, proxy_connect_status: bool = False):
+def get_device_action_request_payload(appliance_id: str, proxy_connect_status: bool = False):
     return {const.APPLIANCE: {const.APPLIANCE_ID: [appliance_id]}, const.REQUEST_PARAMETERS: {const.PROXY_CONNECT_STATUS: proxy_connect_status}}
-
-def get_turn_off_request_payload(appliance_id: str):
-    return get_device_action_request_payload(const.TURN_OFF_REQUEST, appliance_id)
-
-def get_turn_on_request_payload(appliance_id: str):
-    return get_device_action_request_payload(const.TURN_ON_REQUEST, appliance_id)
 
 class TurnOnRequest(Request):
     def __init__(self, appliance_id: str):
-        payload = get_turn_on_request_payload(appliance_id)
+        payload = get_device_action_request_payload(appliance_id)
         super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.TURN_ON_REQUEST, payload)
+
+class SetBrightnessPercentageRequest(Request):
+    def __init__(self, appliance_id: str, brightness: models.Brightness):
+        payload = get_device_action_request_payload(appliance_id)
+        payload[const.BRIGHTNESS] = {const.VALUE: brightness.percentage()}
+        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE] = const.BRIGHTNESS
+        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE_VALUE] = brightness.percentage()
+        super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.SET_BRIGHTNESS_PERCENTAGE_REQUEST, payload)
+
+class SetColorTemperatureRequest(Request):
+    def __init__(self, appliance_id: str, color_temp: models.ColorTemperatureInKelvin):
+        payload = get_device_action_request_payload(appliance_id)
+        payload[const.COLOR_TEMPERATURE_IN_KELVIN] = color_temp.percentage()
+        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE] = const.COLOR_TEMPERATURE_IN_KELVIN
+        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE_VALUE] = color_temp.percentage()
+        super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.SET_COLOR_TEMPERATURE_REQUEST, payload)
 
 class SmartHomeClient:
     def __init__(self, bduss: str, host: str = const.DEFAULT_HOST, schema: str = const.DEFAULT_SCHEMA) -> None:
@@ -63,12 +73,24 @@ class SmartHomeClient:
     def _get_device_action_url(self) -> str:
         return f'{self._schema}{self._host}{const.DEVICE_ACTION_QUERY}'
 
-    async def turn_off(self, appliance_id: str):
+    async def turn_off(self, appliance_id: str) -> DeviceActionResponse:
         async with httpx.AsyncClient() as client:
             response = await client.post(self._get_device_action_url(), cookies=self._cookies, content=TurnOffRequest(appliance_id).to_bytes())
             return DeviceActionResponse(response.json())
 
-    async def turn_on(self, appliance_id: str):
+    async def turn_on(self, appliance_id: str) -> DeviceActionResponse:
         async with httpx.AsyncClient() as client:
             response = await client.post(self._get_device_action_url(), cookies=self._cookies, content=TurnOnRequest(appliance_id).to_bytes())
             return DeviceActionResponse(response.json())
+    
+    async def set_brightness_percentage(self, appliance_id: str, brightness: models.Brightness) -> DeviceActionResponse:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(self._get_device_action_url(), cookies=self._cookies, content=SetBrightnessPercentageRequest(appliance_id, brightness).to_bytes())
+            return DeviceActionResponse(response.json())
+
+    async def set_color_temperature(self, applicance_id: str, color_temp: models.ColorTemperatureInKelvin) -> DeviceActionResponse:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(self._get_device_action_url(), cookies=self._cookies, content=SetColorTemperatureRequest(applicance_id, color_temp).to_bytes())
+            return DeviceActionResponse(response.json())
+
+
