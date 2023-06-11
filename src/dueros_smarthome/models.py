@@ -27,7 +27,7 @@ class ConnectivityAttribute:
 
 class ConnectivitySetting:
     def __init__(self, connectivity_setting: dict):
-        self._value = connectivity_setting[const.VALUE]
+        self._value = Connectivity.from_str(connectivity_setting[const.VALUE])
         self._time = connectivity_setting[const.TIME]
     
     @property

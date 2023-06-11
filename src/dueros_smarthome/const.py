@@ -62,6 +62,7 @@ ICON_URLS = "icons"
 STATUS = "status"
 
 STATUS_OK = 0
+STATUS_NOT_LOGIN = 2
 
 TURN_OFF_REQUEST = "TurnOffRequest"
 TURN_ON_REQUEST = "TurnOnRequest"
