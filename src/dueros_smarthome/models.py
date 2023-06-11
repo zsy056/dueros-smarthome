@@ -313,10 +313,9 @@ class ColorTemperatureInKelvin(Num):
 
 class ColorTemperatureInKelvinSetting:
     def __init__(self, setting: dict):
-        if setting[const.VALUE]:
-            self._value = ColorTemperatureInKelvin(setting[const.VALUE])
-        else:
-            self._value = None
+        self._value = ColorTemperatureInKelvin(setting[const.VALUE] if setting[const.VALUE] else 1,
+                                               kelvin_min=setting[const.VALUE_KELVIN_RANGE_MAP][const.MIN],
+                                               kelvin_max=setting[const.VALUE_KELVIN_RANGE_MAP][const.MAX])
         self._time = setting[const.TIME]
     
     @property

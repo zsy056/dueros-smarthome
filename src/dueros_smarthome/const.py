@@ -60,6 +60,9 @@ BRIGHTNESS_AND_COLOR_TEMPERATURE = "brightnessAndColorTemperature"
 BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON = "brightnessAndColorTemperatureWithIcon"
 ICON_URLS = "icons"
 STATUS = "status"
+VALUE_KELVIN_RANGE_MAP = "valueKelvinRangeMap"
+MIN = "min"
+MAX = "max"
 
 STATUS_OK = 0
 STATUS_NOT_LOGIN = 2
