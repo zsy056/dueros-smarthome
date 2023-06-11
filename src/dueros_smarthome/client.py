@@ -77,6 +77,8 @@ class SmartHomeClient:
         self._bduss = bduss
         self._cookies = httpx.Cookies()
         self._cookies.set(const.BDUSS_COOKIE_KEY, self._bduss, domain = self._host)
+        for key in const.ADDITIONAL_COOKIES:
+            self._cookies.set(key, const.ADDITIONAL_COOKIES[key], domain = self._host)
     
     @property
     def host(self):

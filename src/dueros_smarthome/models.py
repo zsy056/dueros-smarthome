@@ -27,12 +27,12 @@ class ConnectivityAttribute:
 
 class ConnectivitySetting:
     def __init__(self, connectivity_setting: dict):
-        self._connectivity = connectivity_setting[const.VALUE]
+        self._value = connectivity_setting[const.VALUE]
         self._time = connectivity_setting[const.TIME]
     
     @property
-    def connectivity(self):
-        return self._connectivity
+    def value(self):
+        return self._value
 
     @property
     def time(self):
@@ -49,12 +49,15 @@ class TurnOnState(Enum):
     
 class TurnOnStateSetting:
     def __init__(self, turn_on_state_setting: dict):
-        self._turn_on_state = TurnOnState.from_str(turn_on_state_setting[const.VALUE])
+        if turn_on_state_setting[const.VALUE]:
+            self._value = TurnOnState.from_str(turn_on_state_setting[const.VALUE])
+        else:
+            self._value = None
         self._time = turn_on_state_setting[const.TIME]
 
     @property
-    def turn_on_state(self):
-        return self._turn_on_state
+    def value(self):
+        return self._value
 
     @property
     def time(self):
@@ -270,12 +273,15 @@ class Brightness(Num):
 
 class BrightnessSetting:
     def __init__(self, brightness_setting: dict):
-        self._brightness = Brightness(brightness_setting[const.VALUE])
+        if brightness_setting[const.VALUE]:
+            self._value = Brightness(brightness_setting[const.VALUE])
+        else:
+            self._value = None
         self._time = brightness_setting[const.TIME]
 
     @property
-    def brightness(self):
-        return self._brightness
+    def value(self):
+        return self._value
     
     @property
     def time(self):
@@ -307,12 +313,15 @@ class ColorTemperatureInKelvin(Num):
 
 class ColorTemperatureInKelvinSetting:
     def __init__(self, setting: dict):
-        self._color_temperature_in_kelvin = ColorTemperatureInKelvin(setting[const.VALUE])
+        if setting[const.VALUE]:
+            self._value = ColorTemperatureInKelvin(setting[const.VALUE])
+        else:
+            self._value = None
         self._time = setting[const.TIME]
     
     @property
-    def color_temperature_in_kelvin(self):
-        return self._color_temperature_in_kelvin
+    def value(self):
+        return self._value
 
     @property
     def time(self):
@@ -350,6 +359,8 @@ class ApplianceAttributes:
     def __init__(self, attributes: dict):
         if const.CONNECTIVITY in attributes:
             self._connectivity = ConnectivityAttribute(attributes[const.CONNECTIVITY])
+        else:
+            self._connectivity = None
 
     @property
     def connectivity(self):
@@ -390,12 +401,12 @@ class BrightnessAndColorTemperatureWithIconMode(BrightnessAndColorTemperatureMod
 class ApplianceModes:
     def __init__(self, modes: dict):
         if const.BRIGHTNESS_AND_COLOR_TEMPERATURE in modes:
-            self._brightness_and_color_temperature = {mode: BrightnessAndColorTemperatureMode(mode_setting) for (mode, mode_setting) in modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE]}
+            self._brightness_and_color_temperature = {mode: BrightnessAndColorTemperatureMode(modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE][mode]) for mode in modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE]}
         else:
             self._brightness_and_color_temperature = None
 
         if const.BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON in modes:
-            self._brightness_and_color_temperature_with_icon = {mode: BrightnessAndColorTemperatureWithIconMode(mode_setting) for (mode, mode_setting) in modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON]}
+            self._brightness_and_color_temperature_with_icon = {mode: BrightnessAndColorTemperatureWithIconMode(modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON][mode]) for mode in modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON]}
         else:
             self._brightness_and_color_temperature_with_icon = None
 
@@ -476,6 +487,7 @@ class Appliance:
         self._room_id = appliance_info[const.ROOM_ID]
         self._floor_id = appliance_info[const.FLOOR_ID]
         self._attributes = ApplianceAttributes(appliance_info[const.ATTRIBUTES])
+        self._state_settings = ApplianceStateSettings(appliance_info[const.STATE_SETTING])
         self._icon_urls = [icon_url for icon_url in appliance_info[const.ICON_URLS].values()] 
         self._status = appliance_info[const.STATUS]
     
@@ -538,6 +550,10 @@ class Appliance:
     @property
     def attributes(self):
         return self._attributes
+    
+    @property
+    def state_settings(self):
+        return self._state_settings
     
     @property
     def icon_urls(self):

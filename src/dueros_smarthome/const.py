@@ -3,7 +3,7 @@ DEFAULT_HOST = "xiaodu.baidu.com"
 
 DEFAULT_PAYLOAD_VERSION = 3
 
-DEVICE_LIST_QUERY = "/saiya/smarthome/devicelist?form=h5_control&generalscene=2"
+DEVICE_LIST_QUERY = "/saiya/smarthome/devicelist?from=h5_control&withscene=1&generalscene=3"
 DEVICE_ACTION_QUERY = "/saiya/smarthome/directivesend?from=h5_control"
 
 BDUSS_COOKIE_KEY = "BDUSS"
@@ -19,6 +19,8 @@ APPLIANCE = "appliance"
 CONTROL_REQUEST_NAMESPACE = "DuerOS.ConnectedHome.Control"
 ATTRIBUTE = "attribute"
 ATTRIBUTE_VALUE = "attributeValue"
+
+ADDITIONAL_COOKIES = {"smarthome-curtain-device-detail-new": "1"}
 
 STATUS = "status"
 MSG = "msg"
