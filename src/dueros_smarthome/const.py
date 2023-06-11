@@ -59,6 +59,8 @@ BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON = "brightnessAndColorTemperatureWithI
 ICON_URLS = "icons"
 STATUS = "status"
 
+STATUS_OK = 0
+
 TURN_OFF_REQUEST = "TurnOffRequest"
 TURN_ON_REQUEST = "TurnOnRequest"
 SET_BRIGHTNESS_PERCENTAGE_REQUEST = "SetBrightnessPercentageRequest"

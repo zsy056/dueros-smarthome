@@ -17,10 +17,26 @@ class ConnectivityAttribute:
         self._connectivity = connectivity_info[const.VALUE]
         self._timestamp_of_sample = connectivity_info[const.TIMESTAMP_OF_SAMPLE]
 
+    @property
+    def connectivity(self):
+        return self._connectivity
+    
+    @property
+    def timestamp_of_sample(self):
+        return self._timestamp_of_sample
+
 class ConnectivitySetting:
     def __init__(self, connectivity_setting: dict):
         self._connectivity = connectivity_setting[const.VALUE]
         self._time = connectivity_setting[const.TIME]
+    
+    @property
+    def connectivity(self):
+        return self._connectivity
+
+    @property
+    def time(self):
+        return self._time
 
 class TurnOnState(Enum):
     NONE = auto()
@@ -35,6 +51,14 @@ class TurnOnStateSetting:
     def __init__(self, turn_on_state_setting: dict):
         self._turn_on_state = TurnOnState.from_str(turn_on_state_setting[const.VALUE])
         self._time = turn_on_state_setting[const.TIME]
+
+    @property
+    def turn_on_state(self):
+        return self._turn_on_state
+
+    @property
+    def time(self):
+        return self._time
 
 class ApplianceType(Enum):
     NONE = auto()
@@ -220,10 +244,27 @@ class Num:
         self._min = min
         self._max = max
 
+    @property
+    def value(self):
+        return self._value
+    
+    @property
+    def scale(self):
+        return self._scale
+    
+    @property
+    def min(self):
+        return self._min
+    
+    @property
+    def max(self):
+        return self._max
+
 class Brightness(Num):
     def __init__(self, value: int):
         super().__init__(value, scale = '%', min = 1, max = 100)
 
+    @property
     def percentage(self) -> int:
         return self._value
 
@@ -232,24 +273,50 @@ class BrightnessSetting:
         self._brightness = Brightness(brightness_setting[const.VALUE])
         self._time = brightness_setting[const.TIME]
 
+    @property
+    def brightness(self):
+        return self._brightness
+    
+    @property
+    def time(self):
+        return self._time
+
 class ColorTemperatureInKelvin(Num):
     def __init__(self, value: int, kelvin_min: int = '2700', kelvin_max: int = '6500'):
         if kelvin_min > kelvin_max:
             raise ValueError(f'kelvin_min {kelvin_min} is larger than kelvin_max {kelvin_max}')
         super().__init__(value, scale = '%', min = 1, max = 100)
         self._kelvin_min = kelvin_min
-        self._kelvin_min = kelvin_max
+        self._kelvin_max = kelvin_max
     
-    def get_kelvin(self) -> int:
+    @property
+    def in_kelvin(self) -> int:
         return self._kelvinMin + (self._kelvinMax - self._kelvinMin) * (self._value - self._min + 1) / (self._max - self._min + 1)
 
+    @property
     def percentage(self) -> int:
         return self._value
+
+    @property
+    def kelvin_min(self):
+        return self._kelvin_min
+    
+    @property
+    def kelvin_max(self):
+        return self._kelvin_max
 
 class ColorTemperatureInKelvinSetting:
     def __init__(self, setting: dict):
         self._color_temperature_in_kelvin = ColorTemperatureInKelvin(setting[const.VALUE])
         self._time = setting[const.TIME]
+    
+    @property
+    def color_temperature_in_kelvin(self):
+        return self._color_temperature_in_kelvin
+
+    @property
+    def time(self):
+        return self._time
 
 class LightMode:
     def __init__(self, mode_info: dict):
@@ -259,10 +326,34 @@ class LightMode:
         self._name = mode_info[const.NAME]
         self._icon = mode_info[const.ICON_URL]
 
+    @property
+    def mode(self):
+        return self._mode
+    
+    @property
+    def color_temperature_in_kelvin(self):
+        return self._color_temperature_in_kelvin
+    
+    @property
+    def brightness(self):
+        return self._brightness
+    
+    @property
+    def name(self):
+        return self._name
+    
+    @property
+    def icon_url(self):
+        return self._icon
+
 class ApplianceAttributes:
     def __init__(self, attributes: dict):
         if const.CONNECTIVITY in attributes:
             self._connectivity = ConnectivityAttribute(attributes[const.CONNECTIVITY])
+
+    @property
+    def connectivity(self):
+        return self._connectivity
 
 class BrightnessAndColorTemperatureMode:
     def __init__(self, mode: dict):
@@ -271,30 +362,97 @@ class BrightnessAndColorTemperatureMode:
         self._color_temperature_in_kelvin = ColorTemperatureInKelvin(mode[const.COLOR_TEMPERATURE_IN_KELVIN])
         self._name = mode[const.NAME]
 
+    @property
+    def mode(self):
+        return self._mode
+    
+    @property
+    def brightness(self):
+        return self._brightness
+    
+    @property
+    def color_temperature_in_kelvin(self):
+        return self._color_temperature_in_kelvin
+    
+    @property
+    def name(self):
+        return self._name
+
 class BrightnessAndColorTemperatureWithIconMode(BrightnessAndColorTemperatureMode):
     def __init__(self, mode: dict):
         super().__init__(mode)
         self._icon_url = mode[const.ICON_URL]
 
+    @property
+    def icon_url(self):
+        return self._icon_url
+
 class ApplianceModes:
     def __init__(self, modes: dict):
         if const.BRIGHTNESS_AND_COLOR_TEMPERATURE in modes:
             self._brightness_and_color_temperature = {mode: BrightnessAndColorTemperatureMode(mode_setting) for (mode, mode_setting) in modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE]}
+        else:
+            self._brightness_and_color_temperature = None
+
         if const.BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON in modes:
             self._brightness_and_color_temperature_with_icon = {mode: BrightnessAndColorTemperatureWithIconMode(mode_setting) for (mode, mode_setting) in modes[const.BRIGHTNESS_AND_COLOR_TEMPERATURE_WITH_ICON]}
+        else:
+            self._brightness_and_color_temperature_with_icon = None
+
+    @property
+    def brightness_and_color_temperature(self):
+        return self._brightness_and_color_temperature
+    
+    @property
+    def brightness_and_color_temperature_with_icon(self):
+        return self._brightness_and_color_temperature_with_icon
 
 class ApplianceStateSettings:
     def __init__(self, state_settings: dict):
         if const.CONNECTIVITY in state_settings:
             self._connectivity = ConnectivitySetting(state_settings[const.CONNECTIVITY])
+        else:
+            self._connectivity = None
+
         if const.TURN_ON_STATE in state_settings:
             self._turn_on_state = TurnOnStateSetting(state_settings[const.TURN_ON_STATE])
+        else:
+            self._turn_on_state = None
+
         if const.BRIGHTNESS in state_settings:
             self._brightness = BrightnessSetting(state_settings[const.BRIGHTNESS])
+        else:
+            self._brightness = None
+
         if const.COLOR_TEMPERATURE_IN_KELVIN in state_settings:
             self._color_temperature_in_kelvin = ColorTemperatureInKelvinSetting(state_settings[const.COLOR_TEMPERATURE_IN_KELVIN])
+        else:
+            self._color_temperature_in_kelvin = None
+
         if const.MODE in state_settings:
             self._modes = ApplianceModes(state_settings[const.MODE])
+        else:
+            self._modes = None
+    
+    @property
+    def connectivity(self):
+        return self._connectivity
+    
+    @property
+    def turn_on_state(self):
+        return self._turn_on_state
+    
+    @property
+    def brightness(self):
+        return self._brightness
+    
+    @property
+    def color_temperature_in_kelvin(self):
+        return self._color_temperature_in_kelvin
+    
+    @property
+    def modes(self):
+        return self._modes
 
 class Appliance:
     def __init__(self, appliance_info: dict):
@@ -320,3 +478,71 @@ class Appliance:
         self._attributes = ApplianceAttributes(appliance_info[const.ATTRIBUTES])
         self._icon_urls = [icon_url for icon_url in appliance_info[const.ICON_URLS].values()] 
         self._status = appliance_info[const.STATUS]
+    
+    @property
+    def bot_name(self):
+        return self._bot_name
+    
+    @property
+    def bot_id(self):
+        return self._bot_id
+    
+    @property
+    def bot_logo_url(self):
+        return self._bot_logo
+    
+    @property
+    def appliance_id(self):
+        return self._appliance_id
+    
+    @property
+    def appliance_types(self):
+        return self._appliance_types
+    
+    @property
+    def nicknames(self):
+        return self._nicknames
+    
+    @property
+    def friendly_description(self):
+        return self._friendly_description
+    
+    @property
+    def supported_actions(self):
+        return self._supported_actions
+    
+    @property
+    def friendly_name(self):
+        return self._friendly_name
+    
+    @property
+    def group_name(self):
+        return self._group_name
+    
+    @property
+    def group_id(self):
+        return self._group_id
+    
+    @property
+    def room_name(self):
+        return self._room_name
+    
+    @property
+    def room_id(self):
+        return self._room_id
+    
+    @property
+    def floor_id(self):
+        return self._floor_id
+    
+    @property
+    def attributes(self):
+        return self._attributes
+    
+    @property
+    def icon_urls(self):
+        return self._icon_urls
+    
+    @property
+    def status(self):
+        return self._status

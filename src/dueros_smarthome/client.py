@@ -8,10 +8,26 @@ class ResponseCommon:
         self._msg = response[const.MSG]
         self._log_id = response[const.LOGID]
 
+    @property
+    def status(self):
+        return self._status
+
+    @property
+    def msg(self):
+        return self._msg
+
+    @property
+    def log_id(self):
+        return self._log_id
+
 class GetDeviceListResponse(ResponseCommon):
     def __init__(self, response: dict):
         super().__init__(response)
         self._appliances = [models.Appliance(appliance) for appliance in response[const.DATA][const.APPLIANCES]]
+    
+    @property
+    def appliances(self):
+        return self._appliances
 
 class DeviceActionResponse(ResponseCommon):
     def __init__(self, response: dict):
@@ -41,9 +57,9 @@ class TurnOnRequest(Request):
 class SetBrightnessPercentageRequest(Request):
     def __init__(self, appliance_id: str, brightness: models.Brightness):
         payload = get_device_action_request_payload(appliance_id)
-        payload[const.BRIGHTNESS] = {const.VALUE: brightness.percentage()}
+        payload[const.BRIGHTNESS] = {const.VALUE: brightness.percentage}
         payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE] = const.BRIGHTNESS
-        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE_VALUE] = brightness.percentage()
+        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE_VALUE] = brightness.percentage
         super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.SET_BRIGHTNESS_PERCENTAGE_REQUEST, payload)
 
 class SetColorTemperatureRequest(Request):
@@ -61,7 +77,11 @@ class SmartHomeClient:
         self._bduss = bduss
         self._cookies = httpx.Cookies()
         self._cookies.set(const.BDUSS_COOKIE_KEY, self._bduss, domain = self._host)
-
+    
+    @property
+    def host(self):
+        return self._host
+    
     def _get_device_list_url(self) -> str:
         return f'{self._schema}{self._host}{const.DEVICE_LIST_QUERY}'
 
