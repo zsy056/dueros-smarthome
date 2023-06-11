@@ -297,7 +297,7 @@ class ColorTemperatureInKelvin(Num):
     
     @property
     def in_kelvin(self) -> int:
-        return self._kelvinMin + (self._kelvinMax - self._kelvinMin) * (self._value - self._min + 1) / (self._max - self._min + 1)
+        return self._kelvin_min + (self._kelvin_max - self._kelvin_min) * (self._value - self._min + 1) / (self._max - self._min + 1)
 
     @property
     def percentage(self) -> int:
