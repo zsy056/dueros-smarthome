@@ -65,9 +65,9 @@ class SetBrightnessPercentageRequest(Request):
 class SetColorTemperatureRequest(Request):
     def __init__(self, appliance_id: str, color_temp: models.ColorTemperatureInKelvin):
         payload = get_device_action_request_payload(appliance_id)
-        payload[const.COLOR_TEMPERATURE_IN_KELVIN] = color_temp.percentage()
+        payload[const.COLOR_TEMPERATURE_IN_KELVIN] = color_temp.percentage
         payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE] = const.COLOR_TEMPERATURE_IN_KELVIN
-        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE_VALUE] = color_temp.percentage()
+        payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE_VALUE] = color_temp.percentage
         super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.SET_COLOR_TEMPERATURE_REQUEST, payload)
 
 class SmartHomeClient:
