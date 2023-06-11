@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "dueros-smarthome"
+name = "dueros_smarthome"
 version = "0.0.5"
 authors = [
   { name="Shaoyu Zhang", email="zsy056@gmail.com" },
