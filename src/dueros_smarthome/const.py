@@ -63,6 +63,7 @@ STATUS = "status"
 VALUE_KELVIN_RANGE_MAP = "valueKelvinRangeMap"
 MIN = "min"
 MAX = "max"
+DEGREE = "degree"
 
 STATUS_OK = 0
 STATUS_NOT_LOGIN = 2

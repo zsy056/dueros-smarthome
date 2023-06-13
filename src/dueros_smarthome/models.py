@@ -242,7 +242,7 @@ class Num:
         if value > max:
             raise ValueError(f'value {value} is larger than max {max}')
 
-        self._value = value
+        self._value = int(value)
         self._scale = scale
         self._min = min
         self._max = max
@@ -269,7 +269,7 @@ class Brightness(Num):
 
     @property
     def percentage(self) -> int:
-        return self._value
+        return int(self._value)
 
 class BrightnessSetting:
     def __init__(self, brightness_setting: dict):
@@ -288,10 +288,10 @@ class BrightnessSetting:
         return self._time
 
 class ColorTemperatureInKelvin(Num):
-    def __init__(self, value: int, kelvin_min: int = '2700', kelvin_max: int = '6500'):
+    def __init__(self, percentage: int, kelvin_min: int = '2700', kelvin_max: int = '6500'):
         if kelvin_min > kelvin_max:
             raise ValueError(f'kelvin_min {kelvin_min} is larger than kelvin_max {kelvin_max}')
-        super().__init__(value, scale = '%', min = 1, max = 100)
+        super().__init__(percentage, scale = '%', min = 1, max = 100)
         self._kelvin_min = kelvin_min
         self._kelvin_max = kelvin_max
     
@@ -310,6 +310,32 @@ class ColorTemperatureInKelvin(Num):
     @property
     def kelvin_max(self):
         return self._kelvin_max
+
+class Degree(Num):
+    def __init__(self, value: int):
+        super().__init__(value, scale = "%", min = 0, max = 100)
+
+class DegreeSetting:
+    def __init__(self, setting: dict):
+        if setting[const.VALUE]:
+            self._value = Degree(setting[const.VALUE])
+        else:
+            self._value = None
+        self._name = setting[const.NAME]
+        self._time = setting[const.TIME]
+
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def name(self):
+        return self._name
+    
+    @property
+    def time(self):
+        return self._time
+
 
 class ColorTemperatureInKelvinSetting:
     def __init__(self, setting: dict):
@@ -443,6 +469,15 @@ class ApplianceStateSettings:
             self._modes = ApplianceModes(state_settings[const.MODE])
         else:
             self._modes = None
+
+        if const.DEGREE in state_settings:
+            self._degree = DegreeSetting(state_settings[const.DEGREE])
+        else:
+            self._degree = None
+
+    @property
+    def degree(self):
+        return self._degree
     
     @property
     def connectivity(self):
