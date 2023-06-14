@@ -70,6 +70,17 @@ class SetColorTemperatureRequest(Request):
         payload[const.REQUEST_PARAMETERS][const.ATTRIBUTE_VALUE] = color_temp.percentage
         super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.SET_COLOR_TEMPERATURE_REQUEST, payload)
 
+class PauseRequest(Request):
+    def __init__(self, appliance_id: str):
+        payload = get_device_action_request_payload(appliance_id)
+        super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.PAUSE_REQUEST, payload)
+
+class TurnOnPercentRequest(Request):
+    def __init__(self, appliance_id: str, percent: models.Degree):
+        payload = get_device_action_request_payload(appliance_id)
+        payload[const.DEGREE] = percent.value
+        super().__init__(const.CONTROL_REQUEST_NAMESPACE, const.TURN_ON_PERCENT_REQUEST, payload)
+
 class SmartHomeClient:
     def __init__(self, bduss: str, host: str = const.DEFAULT_HOST, schema: str = const.DEFAULT_SCHEMA) -> None:
         self._host = host
@@ -115,4 +126,12 @@ class SmartHomeClient:
             response = await client.post(self._get_device_action_url(), cookies=self._cookies, content=SetColorTemperatureRequest(applicance_id, color_temp).to_bytes())
             return DeviceActionResponse(response.json())
 
+    async def pause(self, appliance_id: str) -> DeviceActionResponse:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(self._get_device_action_url(), cookies=self._cookies, content=PauseRequest(appliance_id).to_bytes())
+            return DeviceActionResponse(response.json())
 
+    async def turn_on_percent(self, appliance_id: str, percent: models.Degree) -> DeviceActionResponse:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(self._get_device_action_url(), cookies=self._cookies, content=TurnOnPercentRequest(appliance_id, percent).to_bytes())
+            return DeviceActionResponse(response.json())
